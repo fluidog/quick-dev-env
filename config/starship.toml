@@ -1,0 +1,32 @@
+format = "$all$fill$cmd_duration$status$line_break$character"
+command_timeout = 2000
+
+[container]
+disabled = true
+
+[username]
+disabled = true
+
+[hostname]
+disabled = true
+
+[c]
+disabled = true
+
+[time]
+disabled = true
+format = '⌚[ $time ]($style)'
+style = "bold red"
+                         
+[directory]
+style = "bold green"
+truncate_to_repo = false
+truncation_symbol = ".../"
+
+[status]
+disabled = false
+symbol = "🔴 "
+format = '[$symbol$status]($style) '
+
+[fill]
+symbol = " "
