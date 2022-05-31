@@ -36,5 +36,6 @@ kzsYv6iXqWJR93LDpm6xQYfo7eU1myfvFiDfEIl2QGRN4KwU= root@fluidog-workspace"
 # Default login shell
 chsh -s /bin/zsh
 
+mkdir -p  /run/sshd
 
 exec /sbin/sshd -D -p 6722

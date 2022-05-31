@@ -52,13 +52,13 @@ RUN curl -sS https://starship.rs/install.sh | sh -s -- --yes &&\
 		ln -s ../lib/diff-so-fancy/diff-so-fancy /usr/local/bin/diff-so-fancy
 
 RUN apt-get -y install fzf bat keychain &&\
-	echo 'eval "$(keychain --eval id_rsa)"' >> $HOME/.zprofile
+	echo 'eval "$(keychain --eval --quiet id_rsa)"' >> $HOME/.zprofile
 
 ADD config /usr/local/config/
 ADD entry.sh /usr/local/bin/
 
 
-RUN mkdir /run/sshd && ssh-keygen -f $HOME/.ssh/id_rsa -N "" &&\
+RUN ssh-keygen -f $HOME/.ssh/id_rsa -N "" &&\
 	ln -s /usr/local/config/starship.toml $HOME/.config/starship.toml
 
 
