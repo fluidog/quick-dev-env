@@ -1,56 +1,44 @@
 version: '3.4'
 
 services:
-
-  sshd:
+  devenv-ubuntu:
     build:
       context: .
-      dockerfile: Dockerfile-sshd
-    image: fluidog/sshd
+      dockerfile: Dockerfile.ubuntu
+    image: fluidog/devenv-ubuntu
     restart: unless-stopped
     network_mode: host
     privileged : true
     tmpfs:
       - /run
+      - /tmp
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /lib/modules:/lib/modules
-      - /usr/src:/usr/src
-      - /root/workspace:/root/workspace
+      - /workspace:/workspace
 
-  samba:
-    image: dperson/samba
-    ports:
-      - "139:139"
-      - "445:445"
-    environment:
-      USERID: 0
-      GROUPID: 0
-    stdin_open: true
-    tty: true
+  devenv-arch:
+    build:
+      context: .
+      dockerfile: Dockerfile.arch
+    image: fluidog/devenv-arch
     restart: unless-stopped
+    network_mode: host
+    privileged : true
+    tmpfs:
+      - /run
+      - /tmp
     volumes:
-      - /root/workspace:/root/workspace
-    command: '
-      -s "workspace;/root/workspace;;no"
-      -g "create mask = 0644" -g "force create mode = 0" 
-      -g "directory mask = 0755" -g "force directory mode = 0"
-      '
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /workspace:/workspace
 
-  # nfs-server:
-  #   image: gists/nfs-server
-  #   ports:
-  #     - "2049:2049"
-  #   environment:
-  #     NFS_OPTION: "fsid=root,rw,sync,insecure,all_squash,anonuid=0,anongid=0,no_subtree_check"
-  #   privileged: true
-  #   volumes:
-  #     - /root/workspace/:/nfs-share
-  #
-
-networks:
-  default:
-    ipam:
-      driver: default
-      config:
-        - subnet: "172.67.0.0/16"
+  nfs-server:
+    image: gists/nfs-server
+    restart: unless-stopped
+    ports:
+      - "2049:2049"
+    environment:
+      NFS_OPTION: "fsid=root,rw,sync,insecure,all_squash,anonuid=0,anongid=0,no_subtree_check"
+    privileged: true
+    volumes:
+      - /workspace/:/nfs-share
+  
