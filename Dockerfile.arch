@@ -50,13 +50,13 @@ RUN pacman --noconfirm -S qemu virtualbox vagrant
 # other 
 RUN pacman --noconfirm -S pacman-contrib tmux cifs-utils smbclient
 
-COPY starship.toml ~/.config/
+COPY starship.toml /root/.config/
 
 # ssh config
 RUN sed -i -e 's/^#PermitRootLogin.*/PermitRootLogin yes/' \
         -e 's/^#GatewayPorts.*/GatewayPorts yes/' /etc/ssh/sshd_config &&\
-    mkdir -p /run/sshd &&\
     mkdir -p ~/.ssh/ &&\
+    ssh-keygen -A &&\
     echo >> ~/.ssh/authorized_keys \
 "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC6aZYJtPRrWujbE9nrlcJrTuC/9CWL2N9rAAse546DIBL\
 JCaD1OKZlFy8sPu/PaNjHF6L2RAKWguh2rZAc4WXgyjZH1Dc3Ue2wDJRghzmmO+BuqE6Qk27ICPCiMcAdyxm\
@@ -67,4 +67,4 @@ N1kD2SKvLi6oZklzW8DmywnSRPlxCdakvDxV+KvRNpOfRW78K6I8wXRN1ps6Kksuz2oCrmYVYOfb5kMV
 kzsYv6iXqWJR93LDpm6xQYfo7eU1myfvFiDfEIl2QGRN4KwU= root@fluidog-workspace"
 
 
-CMD [ "/sbin/sshd", "-D", "-p", "6722"]
+CMD [ "/sbin/sshd", "-D" ]

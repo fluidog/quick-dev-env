@@ -63,12 +63,11 @@ RUN { : "zsh" &&\
 # other 
 RUN apt-get -y install fzf bat 
 
-COPY starship.toml ~/.config/
+COPY starship.toml /root/.config/
 
 # ssh config
 RUN sed -i -e 's/^#PermitRootLogin.*/PermitRootLogin yes/' \
         -e 's/^#GatewayPorts.*/GatewayPorts yes/' /etc/ssh/sshd_config &&\
-    mkdir -p /run/sshd &&\
     mkdir -p ~/.ssh/ &&\
     echo >> ~/.ssh/authorized_keys \
 "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC6aZYJtPRrWujbE9nrlcJrTuC/9CWL2N9rAAse546DIBL\
@@ -80,4 +79,4 @@ N1kD2SKvLi6oZklzW8DmywnSRPlxCdakvDxV+KvRNpOfRW78K6I8wXRN1ps6Kksuz2oCrmYVYOfb5kMV
 kzsYv6iXqWJR93LDpm6xQYfo7eU1myfvFiDfEIl2QGRN4KwU= root@fluidog-workspace"
 
 
-CMD [ "/sbin/sshd", "-D", "-p", "6722"]
+CMD [ "/bin/sh", "-c", "mkdir -p /run/sshd && exec /sbin/sshd -D" ]

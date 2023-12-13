@@ -7,11 +7,12 @@ services:
       dockerfile: Dockerfile.ubuntu
     image: fluidog/devenv-ubuntu
     restart: unless-stopped
-    network_mode: host
+    ports:
+      - "6722:22"
     privileged : true
     tmpfs:
-      - /run
       - /tmp
+      - /run
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /workspace:/workspace
@@ -22,7 +23,8 @@ services:
       dockerfile: Dockerfile.arch
     image: fluidog/devenv-arch
     restart: unless-stopped
-    network_mode: host
+    ports:
+      - "6723:22"
     privileged : true
     tmpfs:
       - /run
