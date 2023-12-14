@@ -2,7 +2,6 @@ FROM archlinux
 LABEL authors="fluidog@163.com"
 
 SHELL ["/bin/bash", "-c"]
-USER root
 
 # mirror
 RUN sed --in-place --regexp-extended -e 's/^NoExtract/#NoExtract/' /etc/pacman.conf &&\
@@ -12,7 +11,6 @@ RUN sed --in-place --regexp-extended -e 's/^NoExtract/#NoExtract/' /etc/pacman.c
 RUN sed --in-place --regexp-extended -e 's/^#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen &&\
 	locale-gen &&\
 	echo LANG=en_US.UTF-8 >> /etc/locale.conf
-
 
 # base packages
 RUN pacman --noconfirm -S git vim openssh rsync man-db man-pages wget cpio unzip bc
@@ -44,8 +42,6 @@ RUN { : "zsh" &&\
         curl -sS https://starship.rs/install.sh | sh -s -- --yes &&\
         echo 'eval "$(starship init zsh)"' >> ~/.zshrc ;}
 
-# linux kernel development
-RUN pacman --noconfirm -S qemu virtualbox vagrant
 
 # other 
 RUN pacman --noconfirm -S pacman-contrib tmux cifs-utils smbclient

@@ -5,10 +5,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.ubuntu
-    image: fluidog/devenv-ubuntu
+    image: fluidog/dev-env:ubuntu
     restart: unless-stopped
     ports:
-      - "6722:22"
+      - "6723:22"
     privileged : true
     tmpfs:
       - /tmp
@@ -17,14 +17,14 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /workspace:/workspace
 
-  devenv-arch:
+  devenv-archlinux:
     build:
       context: .
-      dockerfile: Dockerfile.arch
-    image: fluidog/devenv-arch
+      dockerfile: Dockerfile.archlinux
+    image: fluidog/dev-env:archlinux
     restart: unless-stopped
     ports:
-      - "6723:22"
+      - "6722:22"
     privileged : true
     tmpfs:
       - /run
