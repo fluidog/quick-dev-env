@@ -18,10 +18,10 @@
     docker compose up -d
     ```
     
-3. 远程登录开发环境。
+3. 远程登录开发环境，默认密码为：hello。
     
     ```bash
-    ssh ssh://root@127.0.0.1:6722
+    ssh -p 6722 root@localhost
     ```
     
 
