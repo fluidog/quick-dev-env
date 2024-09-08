@@ -17,6 +17,22 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /workspace:/workspace
 
+  devenv-ubuntu-lite:
+    build:
+      context: .
+      dockerfile: Dockerfile.ubuntulite
+    image: fluidog/dev-env:ubuntulite
+    restart: unless-stopped
+    ports:
+      - "6724:22"
+    privileged : true
+    tmpfs:
+      - /tmp
+      - /run
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /workspace:/workspace
+
   devenv-archlinux:
     build:
       context: .

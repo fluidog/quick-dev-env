@@ -30,3 +30,11 @@ jobs:
         file: ./Dockerfile.ubuntu
         push: true
         tags: fluidog/dev-env:ubuntu
+
+    - name: Build and push Docker image of ubuntu-lite
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./Dockerfile.ubuntulite
+        push: true
+        tags: fluidog/dev-env:ubuntulite

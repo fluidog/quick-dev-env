@@ -1,0 +1,67 @@
+FROM ubuntu:22.04
+LABEL authors="fluidog@163.com"
+
+SHELL ["/bin/bash", "-c"]
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# mirror
+RUN sed -i -E -e "s,^\# deb-src,deb-src," /etc/apt/sources.list &&\
+	apt-get -y update
+
+# localize
+RUN apt-get install -y locales && rm -rf /var/lib/apt/lists/* \
+	&& localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
+ENV LANG en_US.utf8
+
+# base packages
+RUN unminimize <<< $'y\n\n' &&\
+	apt-get -y install git vim man iproute2 iputils-ping psmisc ssh rsync curl file
+
+# docker
+RUN apt-get -y install ca-certificates curl gnupg lsb-release &&\
+	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg &&\
+	echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] \
+	https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null &&\
+	apt-get -y update &&\
+	apt-get -y install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+
+
+#python3
+RUN apt-get -y install python3 python3-pip python3-venv &&\
+	update-alternatives --install /usr/bin/python python /usr/bin/python3 3
+
+
+# terminal environment: zsh ohmyzsh starship
+RUN { : "zsh" &&\
+	apt-get -y install zsh &&\
+	chsh -s /bin/zsh ;} &&\
+	{ : "ohmyzsh" &&\
+	git clone --depth 1 https://github.com/ohmyzsh/ohmyzsh.git ~/.oh-my-zsh &&\
+	cp ~/.oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc &&\
+	sed -i -e 's/^plugins=(git)/plugins=(git\n)/' ~/.zshrc &&\
+	sed -i -e '/^plugins=(git/a \docker z zsh-navigation-tools command-not-found aliases'\
+		-e 's/^# export LANG=en_US.UTF-8/export LANG=en_US.UTF-8/' ~/.zshrc &&\
+	git clone --depth 1 https://github.com/zsh-users/zsh-syntax-highlighting.git\
+		${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting &&\
+	sed -i -e '/^plugins=(git/a \zsh-syntax-highlighting' ~/.zshrc &&\
+	git clone --depth 1 https://github.com/zsh-users/zsh-autosuggestions.git \
+		${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions &&\
+	sed -i -e '/^plugins=(git/a \zsh-autosuggestions' ~/.zshrc ;} &&\
+	{ : "strship" &&\
+	curl -sS https://starship.rs/install.sh | sh -s -- --yes &&\
+	echo 'eval "$(starship init zsh)"' >> ~/.zshrc ;}
+
+# other 
+RUN apt-get -y install fzf bat 
+
+COPY starship.toml /root/.config/
+
+# ssh config
+RUN sed -i -e 's/^#PermitRootLogin.*/PermitRootLogin yes/' \
+        -e 's/^#GatewayPorts.*/GatewayPorts yes/' /etc/ssh/sshd_config &&\
+    mkdir -p ~/.ssh/ &&\
+    echo "root:hello" | chpasswd &&\
+    echo "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC6aZYJtPRrWujbE9nrlcJrTuC/9CWL2N9rAAse546DIBLJCaD1OKZlFy8sPu/PaNjHF6L2RAKWguh2rZAc4WXgyjZH1Dc3Ue2wDJRghzmmO+BuqE6Qk27ICPCiMcAdyxmTp2RDib/xNp+muQKuv+QONmeP06vkMJzTTgC+srLvO076mAXSv8fNtWQ6O2jApJ9EcuY0BnvJi216A6BjoMAuo2Ctg+cf5Uf9qvOi5ojWj8mFLfvEkzTaYOcUMqZ/rIGPu0vv58B2ZxfY+klP6hWmU8sDcbTWg0H6ZeHln0BN1kD2SKvLi6oZklzW8DmywnSRPlxCdakvDxV+KvRNpOfRW78K6I8wXRN1ps6Kksuz2oCrmYVYOfb5kMVi7U68oBJYPDimm5/tliNeHIXfgopp+m2Q3F/U1/0GoOUjkI+7KdBDuL8HlaGy9YteYGJKCWWDTo+X2JEbUb8/GiOkzsYv6iXqWJR93LDpm6xQYfo7eU1myfvFiDfEIl2QGRN4KwU= root@fluidog-workspace" >> ~/.ssh/authorized_keys
+
+CMD [ "/bin/sh", "-c", "mkdir -p /run/sshd && exec /sbin/sshd -D" ]
